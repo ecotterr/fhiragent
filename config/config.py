@@ -4,15 +4,23 @@ import os
 from pathlib import Path
 from typing import Any, Literal
 from pydantic import BaseModel, Field, model_validator
-
+from typing import Literal
 from dotenv import load_dotenv
 import os
 
 load_dotenv()  # This loads the .env file into environment variables
 
+class OpenAIModel(str, Enum):
+    GPT_4_1 = "gpt-4.1"
+    GPT_4_1_MINI = "gpt-4.1-mini"
+    GPT_4O = "gpt-4o"
+    GPT_4O_MINI = "gpt-4o-mini"
+    O1 = "o1"
+    O3_MINI = "o3-mini"
+
 
 class ModelConfig(BaseModel):
-    name: str = "gpt-4.1-mini"
+    name: OpenAIModel = OpenAIModel.GPT_4_1_MINI
     temperature: float = Field(default=1, ge=0.0, le=2.0)
     context_window: int = 500_000
 
@@ -127,7 +135,6 @@ class Config(BaseModel):
     fhir: FHIRConfig | None = None
     debug: bool = False
 
-    
 
     @property
     def api_key(self) -> str | None:
@@ -138,21 +145,24 @@ class Config(BaseModel):
         return os.environ.get("BASE_URL")
 
     @property
-    def model_name(self) -> str:
-        return self.model.name
+    def model_name(self) -> OpenAIModel:
+        return self.model.name.value
 
     @model_name.setter
     def model_name(self, value: str) -> None:
-        self.model.name = value
+        try:
+            self.model.name = OpenAIModel(value)
+        except ValueError:
+            valid = ", ".join(m.value for m in OpenAIModel)
+            raise ValueError(f"Invalid OpenAI model: {value}. Valid models: {valid}")
 
     @property
     def temperature(self) -> float:
         return self.model.temperature
 
-    @model_name.setter
-    def temperature(self, value: str) -> None:
+    @temperature.setter
+    def temperature(self, value: float) -> None:
         self.model.temperature = value
-
 
     def validate(self) -> list[str]:
         errors: list[str] = []

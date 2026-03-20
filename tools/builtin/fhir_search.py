@@ -233,13 +233,13 @@ class FHIRSearchTool(Tool):
 
         # Resolve natural-language term to a coded token (system|code)
         token: str | None = None
-        if params.code_text and params.clinical_domain:
-            if params.clinical_domain in (ClinicalDomain.condition, ClinicalDomain.allergy):
-                token = lookup_snomed(params.code_text)
-            elif params.clinical_domain == ClinicalDomain.observation:
-                token = lookup_loinc(params.code_text)
-            elif params.clinical_domain == ClinicalDomain.medication:
-                token = lookup_rxnorm(params.code_text)
+        # if params.code_text and params.clinical_domain:
+        #     if params.clinical_domain in (ClinicalDomain.condition, ClinicalDomain.allergy):
+        #         token = lookup_snomed(params.code_text)
+        #     elif params.clinical_domain == ClinicalDomain.observation:
+        #         token = lookup_loinc(params.code_text)
+        #     elif params.clinical_domain == ClinicalDomain.medication:
+        #         token = lookup_rxnorm(params.code_text)
 
         # Apply reverse chaining FIRST for Patient cohorts
         query_params = self._apply_reverse_chaining(

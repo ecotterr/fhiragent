@@ -6,7 +6,9 @@ from client.llm_client import LLMClient
 from config.config import Config
 from config.loader import get_data_dir
 from context.compaction import ChatCompactor
+from context.loop_detector import LoopDetector
 from context.manager import ContextManager
+from hooks.hook_system import HookSystem
 from safety.approval import ApprovalManager
 from tools.builtin.registry import create_default_registry
 from tools.discovery import ToolDiscoveryManager
@@ -26,6 +28,8 @@ class Session:
         self.mcp_manager = MCPManager(self.config)
         self.chat_compactor = ChatCompactor(self.client)
         self.approval_manager = ApprovalManager(self.config.approval, self.config.cwd, )
+        self.loop_detector = LoopDetector()
+        self.hook_system = HookSystem(config)
         self.turn_count = 0
 
     async def initialize(self) -> None:
@@ -70,3 +74,14 @@ class Session:
         self.updated_at = datetime.now()
 
         return self.turn_count
+
+    def get_stats(self) -> dict[str, Any]:
+        return {
+            "session_id": self.session_id,
+            "created_at": self.created_at.isoformat(),
+            "turn_count": self.turn_count,
+            "message_count": self.context_manager.message_count,
+            "token_usage": self.context_manager.total_usage,
+            "tools_count": len(self.tool_registry.get_tools()),
+            "mcp_servers": len(self.tool_registry.connected_mcp_servers),
+        }

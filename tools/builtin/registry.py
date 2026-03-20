@@ -4,6 +4,7 @@ from typing import Any
 #from hooks.hook_system import HookSystem
 #from safety.approval import ApprovalContext, ApprovalDecision, ApprovalManager
 from config.config import Config
+from hooks.hook_system import HookSystem
 from safety.approval import ApprovalContext, ApprovalDecision, ApprovalManager
 from tools.base import Tool, ToolInvocation, ToolResult
 import logging
@@ -73,7 +74,7 @@ class ToolRegistry:
         name: str,
         params: dict[str, Any],
         cwd: Path,
-        #hook_system: HookSystem,
+        hook_system: HookSystem,
         approval_manager: ApprovalManager | None = None,
     ) -> ToolResult:
         tool = self.get(name)
@@ -82,7 +83,7 @@ class ToolRegistry:
                 f"Unknown tool: {name}",
                 metadata={"tool_name": name},
             )
-            #await hook_system.trigger_after_tool(name, params, result)
+            await hook_system.trigger_after_tool(name, params, result)
             return result
 
         validation_errors = tool.validate_params(params)
@@ -94,9 +95,10 @@ class ToolRegistry:
                     "validation_errors": validation_errors,
                 },
             )
-
+            await hook_system.trigger_after_tool(name, params, result)
             return result
 
+        await hook_system.trigger_before_tool(name, params)
         invocation = ToolInvocation(
             params=params,
             cwd=cwd,
@@ -118,14 +120,14 @@ class ToolRegistry:
                     result = ToolResult.error_result(
                         "Operation rejected by safety policy"
                     )
-                    #await hook_system.trigger_after_tool(name, params, result)
+                    await hook_system.trigger_after_tool(name, params, result)
                     return result
                 elif decision == ApprovalDecision.NEEDS_CONFIRMATION:
                     approved = approval_manager.request_confirmation(confirmation)
 
                     if not approved:
                         result = ToolResult.error_result("User rejected the operation")
-                        #await hook_system.trigger_after_tool(name, params, result)
+                        await hook_system.trigger_after_tool(name, params, result)
                         return result
 
         try:
@@ -140,6 +142,7 @@ class ToolRegistry:
                     name,
                 },
             )
+        await hook_system.trigger_after_tool(name, params, result)
         return result
 
 

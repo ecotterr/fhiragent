@@ -48,6 +48,10 @@ class ContextManager:
     def get_system_prompt(self):
         return self._system_prompt
 
+    @property
+    def message_count(self) -> int:
+        return len(self._messages)
+
     def add_user_message(self, content: str) -> None:
         item = MessageItem(role="user", content=content, token_count=count_tokens(content or "", self._model_name))
         self._messages.append(item)
@@ -188,5 +192,8 @@ class ContextManager:
             pruned_count += 1
 
         return pruned_count
+
+    def clear(self) -> None:
+        self._messages = []
 
 

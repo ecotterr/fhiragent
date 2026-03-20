@@ -1,3 +1,5 @@
+hooks_enabled = true
+
 [model]
 name = "gpt-4.1-mini"
 
@@ -9,7 +11,17 @@ auth = "BasicAuth"
 username = "_System"
 password = "ISCDEMO"
 
+[[hooks]]
+name='test_before_tool'
+trigger='before_tool'
+command='python3 ./scripts/test_tool.py'
 
-[mcp_servers.filesyste]
+[[hooks]]
+name='test_before_agent'
+trigger='before_agent'
+command='python3 ./scripts/test_tool.py'
+
+
+[mcp_servers.filesystem]
 command = "npx"
 args =['-y', '@modelcontextprotocol/server-filesystem', '/Users/pjamieso/claude/ai-agent', '/tmp']

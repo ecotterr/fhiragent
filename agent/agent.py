@@ -19,7 +19,7 @@ class Agent:
         self.session.approval_manager.confirmation_callback = confirmation_callback
 
     async def run(self, message: str):
-        #await self.session.hook_system.trigger_before_agent(message)
+        await self.session.hook_system.trigger_before_agent(message)
         yield AgentEvent.agent_start(message)
         self.session.context_manager.add_user_message(message)
 
@@ -31,7 +31,7 @@ class Agent:
             if event.type == AgentEventType.TEXT_COMPLETE:
                 final_response = event.data.get("content")
 
-        # await self.session.hook_system.trigger_after_agent(message, final_response)
+        await self.session.hook_system.trigger_after_agent(message, final_response)
         yield AgentEvent.agent_end(final_response)
 
     async def _agentic_loop(self) -> AsyncGenerator[AgentEvent, None]:
@@ -96,10 +96,10 @@ class Agent:
             )
             if response_text:
                 yield AgentEvent.text_complete(response_text)
-                # self.session.loop_detector.record_action(
-                #     "response",
-                #     text=response_text,
-                # )
+                self.session.loop_detector.record_action(
+                    "response",
+                    text=response_text,
+                )
 
             if not tool_calls:
                 if usage:
@@ -118,17 +118,17 @@ class Agent:
                     tool_call.arguments,
                 )
 
-                # self.session.loop_detector.record_action(
-                #     "tool_call",
-                #     tool_name=tool_call.name,
-                #     args=tool_call.arguments,
-                # )
+                self.session.loop_detector.record_action(
+                    "tool_call",
+                    tool_name=tool_call.name,
+                    args=tool_call.arguments,
+                )
 
                 result = await self.session.tool_registry.invoke(
                     tool_call.name,
                     tool_call.arguments,
                     self.config.cwd,
-                    #self.session.hook_system,
+                    self.session.hook_system,
                     self.session.approval_manager,
                 )
 
@@ -152,10 +152,10 @@ class Agent:
                     tool_result.content,
                 )
 
-            # loop_detection_error = self.session.loop_detector.check_for_loop()
-            # if loop_detection_error:
-            #     loop_prompt = create_loop_breaker_prompt(loop_detection_error)
-            #     self.session.context_manager.add_user_message(loop_prompt)
+            loop_detection_error = self.session.loop_detector.check_for_loop()
+            if loop_detection_error:
+                loop_prompt = create_loop_breaker_prompt(loop_detection_error)
+                self.session.context_manager.add_user_message(loop_prompt)
 
             if usage:
                 self.session.context_manager.set_latest_usage(usage)
