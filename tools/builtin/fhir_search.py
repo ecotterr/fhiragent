@@ -17,14 +17,14 @@ from utils.codes.snomed import lookup_snomed
 class ClinicalDomain(str, Enum):
     condition = "condition"
     observation = "observation"
-    medication = "medication"
+    medicationrequest = "medicationrequest"
     allergy = "allergy"
 
 
 class FHIRSearchParams(BaseModel):
     resource_type: str = Field(
         ...,
-        description="FHIR resource type to search (e.g., 'Patient', 'Observation', 'Encounter')",
+        description="FHIR resource type to search (e.g., 'Patient', 'Observation', 'Encounter', 'MedicationRequest')",
         examples=["Patient", "Observation"],
     )
 
@@ -57,7 +57,7 @@ class FHIRSearchParams(BaseModel):
             "'http://snomed.info/sct|709044004'. "
             "Use this after resolving a clinical term via MCP terminology tools. "
             "When provided with clinical_domain and resource_type=Patient, triggers "
-            "_has reverse-chaining to find patients with matching conditions/observations/medications."
+            "_has reverse-chaining to find patients with matching conditions/observations/medicationrequests."
         ),
     )
 
@@ -65,7 +65,7 @@ class FHIRSearchParams(BaseModel):
         default=None,
         description=(
             "Indicates the type of clinical concept for terminology resolution. "
-            "condition -> SNOMED CT, observation -> LOINC, medication -> RxNorm, allergy -> SNOMED CT."
+            "Condition -> SNOMED CT, Observation -> LOINC, MedicationRequest -> RxNorm, allergy -> SNOMED CT."
         ),
     )
 
@@ -73,7 +73,7 @@ class FHIRSearchParams(BaseModel):
         default=True,
         description=(
             "If true and resource_type is a parent resource (especially Patient), rewrite cohort-style requests "
-            "like 'patients with <condition/observation/medication/allergy>' to use FHIR reverse-chaining "
+            "like 'patients with <condition/observation/medicationrequest/allergy>' to use FHIR reverse-chaining "
             "with the _has parameter. When resource_type is Patient and a clinical_domain is provided, "
             "do NOT use code= on Patient; use _has instead."
         ),
@@ -145,7 +145,7 @@ class FHIRSearchTool(Tool):
             elif "loinc.org" in token:
                 clinical_domain = ClinicalDomain.observation
             elif "rxnorm" in token or "nlm.nih.gov" in token:
-                clinical_domain = ClinicalDomain.medication
+                clinical_domain = ClinicalDomain.medicationrequest
 
         if clinical_domain is None:
             return qp
@@ -163,9 +163,9 @@ class FHIRSearchTool(Tool):
             qp["_has:AllergyIntolerance:patient:code"] = token
         elif clinical_domain == ClinicalDomain.observation:
             qp["_has:Observation:subject:code"] = token
-        elif clinical_domain == ClinicalDomain.medication:
+        elif clinical_domain == ClinicalDomain.medicationrequest:
             # Server/profile dependent. Start with MedicationRequest.
-            qp["_has:MedicationRequest:subject:medication"] = token
+            qp["_has:MedicationRequest:subject:code"] = token
 
         return qp
 

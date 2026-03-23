@@ -29,3 +29,4 @@ args =['-y', '@modelcontextprotocol/server-filesystem', '/Users/pjamieso/claude/
 [mcp_servers.medical-terminologies]
 command = "/opt/homebrew/bin/npx"
 args = ["-y", "medical-terminologies-mcp"]
+

@@ -22,6 +22,7 @@ class GrepTool(Tool):
     name = "grep"
     description = "Search for a regex pattern in file contents. Returns matching lines with file paths and line numbers."
     kind = ToolKind.READ
+    enabled = False
     schema = GrepParams
 
     async def execute(self, invocation: ToolInvocation) -> ToolResult:
