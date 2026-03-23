@@ -65,7 +65,9 @@ class FHIRSearchParams(BaseModel):
         default=None,
         description=(
             "Indicates the type of clinical concept for terminology resolution. "
-            "Condition -> SNOMED CT, Observation -> LOINC, MedicationRequest -> RxNorm, allergy -> SNOMED CT."
+            "Exact values: 'condition' (diagnoses/problems, SNOMED CT), 'observation' (labs/vitals, LOINC), "
+            "'medicationrequest' (drugs/medications/prescriptions, RxNorm — NOT 'medication'), "
+            "'allergy' (allergy intolerances, SNOMED CT)."
         ),
     )
 
