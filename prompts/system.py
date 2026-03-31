@@ -256,7 +256,8 @@ You have access to the following tools to accomplish your tasks:
    - Retrieve stored preferences when relevant
    
 6. **FHIR**
-   - Use the `fhir_search` tool to search for FHIR resources
+   - Use the `fhir_search` tool to search for FHIR resources,
+     if there is a user preference retrieved from the memory tool, like computing the average heart rate for a patient, apply that if applicable.
    - Use the `fhir_read` tool to read a FHIR resource
    - Use the `fhir_update` tool to update a FHIR resource
    - **Auto-detect clinical domain**: Before anything else, classify the clinical term in the user's query:

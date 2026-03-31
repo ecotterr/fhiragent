@@ -4,5 +4,14 @@ Show the /help that provides information on chaning the model, listing tools, mc
 Show the /config command that shows the model, temperature, max turns, Base FHIR Url, and FHIR fhir_schema
 Show the /mcp to show the mcp servers that are connected and the number of tools in these servers
 Show the /tools to show what tools the agents can use
-
-Show an bad prompt: please create an effective clinical summary of patient 1 in the FHIR repository
+Show an summary prompt: please create an effective clinical summary of patient 1 in the FHIR repository
+Now use /stats to show the amount of token usage = notice total tokens is less than 16K where the overall size of fhir Bundle is at least 10 times larger
+Show: can you just show me the Fhir Resource for Patient 2 (notice what tool is called: fhir_read)
+Show: can you find me patients whose last name is Baumbach and whose sex is female? (what tool is called: fhir_search)
+Show: find all patients in the FHIR repository with diabetes. Notice we don't find any patients because none where coded this way in the FHIR repository
+find all patients in the FHIR repository with an allergy to Peanuts
+retrieve all the resources for patient 1 using $everything
+Notice also that two tools where needed including our MCP server medical-terminologies__snomed_search and fhir_search
+Show: find all patients in the fhir repository with type 2 diabetes mellitus -- now notice that 6 patients where found
+Show: find all patients with hypertension, are you surprised it is zero -- lets look carefully at the terminology resolution
+Show: find all patients in the FHIR repository with essential hypertension. Now notice we have 30 entries.

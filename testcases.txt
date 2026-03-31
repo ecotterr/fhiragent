@@ -22,7 +22,7 @@ Correct Search: [base] Patient/4/$everything
 Prompt String: can you create a comprehensive patient summary of patient 4?
 Correct Search: uses [base] Patient/4/$everything and then Bundle extractor to create formatted summary
 
-Prompt String: Find all patients with a total serum cholesterol with values over 180 mg/dL 
+Prompt String: Find all patients with a total serum cholesterol with values over 180 mg/dL (requires composite search)
 Correct Search: Two problems, did not find the correct loinc code which is 2093-3 and did not use reverse chainging correctly with two paramets
 the correct answer is [base]/Patient?_has:Observation:patient:code=http://loinc.org|2093-3&_has:Observation:patient:value-quantity=gt180
 
@@ -33,16 +33,16 @@ Prompt String: List patient 4 medications from the FHIR repository (ambiguous wr
 Better Prompt: what I meant was list the medications for the patient whose fhir id is 4.
 Correct Search: [base]/MedicationRequest?patient=4&_count=10 
 
-Prompt String:
-Correct Search:
+Prompt String: find a medication request with Hydrochlorothiazide 25 MG Oral Tablet,
+Correct Search: MedicationRequest ID: 195 found
 
-Prompt String:
-Correct Search:
+Prompt String: Please change this from Hydrocholorthiazide 25 MG Oral Tablet to Hydrocholothiazide 50 mg oral tablet
+Correct Search: should call fhir_update, do not approve.
 
-Prompt String:
-Correct Search:
+Prompt String: create an effective clinical summary for a patient with the FHIR Id of 4
+Correct Search: should use the subagent, then use /stats to show the token count
 
-Prompt String:
+Prompt String: please list all the heart rate data on patient 2008 for the dates between 2011-01-01 and 2017-12-31
 Correct Search:
 
 Prompt String:
