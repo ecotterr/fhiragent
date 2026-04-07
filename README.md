@@ -4,6 +4,29 @@ This project runs an interactive AI agent that can call tools (including FHIR to
 
 ## 1) Build and Run with Docker
 
+### Prerequisite: your own OpenAI API key
+
+For the workshop, each participant must use their own OpenAI API key.
+
+1. Purchase/create your OpenAI API key in your own OpenAI account.
+2. In the project root, copy the example file:
+
+```bash
+cp .env.example .env
+```
+
+3. Open `.env`.
+4. Set the key using this exact variable name:
+
+```env
+OPENAI_API_KEY=your_actual_openai_api_key_here
+```
+
+Important:
+- Keep the variable name exactly `OPENAI_API_KEY` (uppercase, with underscores).
+- Do not wrap the key in quotes.
+- Do not commit your personal key to git or share it publicly.
+
 ### Build the image
 
 From the project root:
