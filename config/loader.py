@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from typing import Any
 
@@ -62,6 +63,22 @@ def _get_agent_md_files(cwd: Path) -> Path | None:
     return None
 
 
+def _fhir_base_url_from_env() -> str | None:
+    """Build FHIR base URL from BASE_FHIR_ADDRESS + BASE_FHIR_PATH when set (e.g. .env / Compose)."""
+    addr = os.environ.get("BASE_FHIR_ADDRESS", "").strip()
+    if not addr:
+        return None
+    path = os.environ.get("BASE_FHIR_PATH", "").strip()
+    base = addr.rstrip("/")
+    if path:
+        if not path.startswith("/"):
+            path = "/" + path
+        base = base + path
+    if not base.endswith("/"):
+        base = base + "/"
+    return base
+
+
 def _merge_dicts(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]:
     result = base.copy()
     for key, value in override.items():
@@ -101,6 +118,16 @@ def load_config(cwd: Path | None) -> Config:
         agent_md_content = _get_agent_md_files(cwd)
         if agent_md_content:
             config_dict["developer_instructions"] = agent_md_content
+
+    env_fhir_url = _fhir_base_url_from_env()
+    if env_fhir_url:
+        fhir_cfg = config_dict.get("fhir")
+        if not isinstance(fhir_cfg, dict):
+            fhir_cfg = {}
+        else:
+            fhir_cfg = fhir_cfg.copy()
+        fhir_cfg["base_url"] = env_fhir_url
+        config_dict["fhir"] = fhir_cfg
 
     try:
         config = Config(**config_dict)

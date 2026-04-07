@@ -1,0 +1,37 @@
+# Interactive TUI needs your terminal attached. Do NOT use `up -d` for that — `-d` detaches
+# and you stay on the host shell with no stdin to the app.
+#
+# Recommended (one-off interactive session with this same service config):
+#   docker compose run --rm ai-agent
+#
+# Alternative (foreground; Ctrl+C stops the container):
+#   docker compose up
+#
+# If you already started detached, stop it then run interactively:
+#   docker compose down
+#   docker compose run --rm ai-agent
+
+services:
+  ai-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ai-agent:local
+    env_file:
+      - .env
+    # Resolve "host.docker.internal" to the host, so a FHIR container that publishes :8080 on
+    # the host (e.g. -p 8080:8080) is reachable from this service.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      # Overrides .env for this service only: inside the container, 127.0.0.1 is not the host.
+      BASE_FHIR_ADDRESS: http://host.docker.internal:8080
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./:/workspace
+    entrypoint: ["/app/.venv/bin/python", "/workspace/main.py"]
+    command: ["--cwd", "/workspace"]
+    # If your FHIR stack uses a Compose network and does NOT publish 8080 on the host, attach
+    # both projects to the same external network and set BASE_FHIR_ADDRESS in .env to the FHIR
+    # service hostname, e.g. http://fhir:8080 — then remove or adjust `extra_hosts` / env above.

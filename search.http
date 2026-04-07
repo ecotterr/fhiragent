@@ -27,7 +27,7 @@ Prefer: return=representation
 
 ###
 
-GET http://127.0.0.1:8080/csp/healthshare/demo/fhir/r4/Observation?subject=Patient/1
+GET http://127.0.0.1:8080/csp/healthshare/demo/fhir/r4/Observation?subject=Patient/2008
 Authorization: Basic _System:ISCDEMO
 Accept: */*
 content-type: application/fhir+json
